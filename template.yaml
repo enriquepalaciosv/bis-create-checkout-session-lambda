@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  create-checkout-session
+
+  Sample SAM Template for create-checkout-session
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Parameters:
+  StripeKey:
+    Type: String
+  SuccessUrl:
+    Type: String
+  CancelUrl:
+    Type: String
+
+Globals:
+  Function:
+    Timeout: 3
+    Environment:
+      Variables:
+        STRIPE_KEY: !Ref StripeKey
+        SUCCESS_URL: !Ref SuccessUrl
+        CANCEL_URL: !Ref CancelUrl
+
+Resources:
+  CreateCheckoutSessionFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/
+      Handler: app.lambdaHandler
+      Runtime: nodejs12.x
+
+Outputs:
+  CreateCheckoutSessionFunction:
+    Description: "Create Checkout Session Lambda Function ARN"
+    Value: !GetAtt CreateCheckoutSessionFunction.Arn
+  CreateCheckoutSessionFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt CreateCheckoutSessionFunctionRole.Arn
