@@ -17,7 +17,7 @@ let response;
 exports.lambdaHandler = async (event, context) => {
   try {
     const stripe = require("stripe")(process.env.STRIPE_KEY);
-    const body = JSON.parse(event.body);
+    const body = event;
     const session = {
       payment_method_types: ["card"],
       line_items: [
@@ -28,20 +28,17 @@ exports.lambdaHandler = async (event, context) => {
       ],
 
       locale: "es",
-      mode: body.mode,
+      mode: body.mode === "one_time" ? "payment" : "subscription",
       success_url: process.env.SUCCESS_URL,
       cancel_url: process.env.CANCEL_URL,
     };
     if (body.customerId) {
       session.customer = body.customerId;
     }
-    if (body.customerEmail) {
-      session.customer_email = body.customerEmail;
-    }
-    const session = await stripe.checkout.sessions.create(session);
+    const sessionResponse = await stripe.checkout.sessions.create(session);
     response = {
       statusCode: 200,
-      body: JSON.stringify({ id: session.id }),
+      body: JSON.stringify({ id: sessionResponse.id }),
     };
   } catch (err) {
     console.log(err);
